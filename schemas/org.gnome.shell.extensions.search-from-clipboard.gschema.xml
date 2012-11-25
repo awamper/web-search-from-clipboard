@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+
+  <schema path="/org/gnome/shell/extensions/search-from-clipboard/" id="org.gnome.shell.extensions.search-from-clipboard">
+
+    <key type="as" name="search-shortcut">
+      <default><![CDATA[['<Super>S']]]></default>
+    </key>
+
+    <key type="as" name="go-shortcut">
+      <default><![CDATA[['<Super>G']]]></default>
+    </key>
+
+    <key type="s" name="search-engine">
+      <default>
+        "http://google.com/search?q={term}"
+      </default>
+      <summary>Search engine.</summary>
+    </key>
+  </schema>
+</schemalist>
