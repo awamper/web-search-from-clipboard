@@ -1,13 +1,13 @@
 {
-    "description": "Web search from clipboard.\n<Super>+S - search\n<Super>+G - open url",
-    "name": "Search From Clipboard",
+    "description": "<Super>+S - search\n<Super>+G - open url",
+    "name": "Web Search From Clipboard",
     "shell-version": [
 	"3.4",
         "3.6"
     ],
     "url": "",
-    "uuid": "search_from_clipboard@awamper.gmail.com",
-    "settings-schema": "org.gnome.shell.extensions.search-from-clipboard",
+    "uuid": "web_search_from_clipboard@awamper.gmail.com",
+    "settings-schema": "org.gnome.shell.extensions.web-search-from-clipboard",
     "dev-version": "0.1",
     "version": 1
 }

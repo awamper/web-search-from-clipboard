@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="gnome-shell-extensions">
 
-  <schema path="/org/gnome/shell/extensions/search-from-clipboard/" id="org.gnome.shell.extensions.search-from-clipboard">
+  <schema path="/org/gnome/shell/extensions/web-search-from-clipboard/" id="org.gnome.shell.extensions.web-search-from-clipboard">
 
     <key type="as" name="search-shortcut">
       <default><![CDATA[['<Super>S']]]></default>
