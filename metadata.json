@@ -1,7 +1,8 @@
 {
-    "description": "Web search from clipboard. <Super>+S - search\n<Super>+G - open url",
+    "description": "Web search from clipboard.\n<Super>+S - search\n<Super>+G - open url",
     "name": "Search From Clipboard",
     "shell-version": [
+	"3.4",
         "3.6"
     ],
     "url": "",
