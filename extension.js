@@ -152,7 +152,7 @@ const SearchFromClipboard = new Lang.Class({
             }
             else {
                 let popup_params = {
-                    text: 'Opening..."',
+                    text: 'Opening...',
                     icon_name: ICONS.information,
                     timeout: 850
                 };
