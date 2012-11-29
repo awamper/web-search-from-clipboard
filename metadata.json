@@ -5,7 +5,7 @@
 	"3.4",
         "3.6"
     ],
-    "url": "",
+    "url": "https://github.com/awamper/web-search-from-clipboard",
     "uuid": "web_search_from_clipboard@awamper.gmail.com",
     "settings-schema": "org.gnome.shell.extensions.web-search-from-clipboard",
     "dev-version": "0.1",
