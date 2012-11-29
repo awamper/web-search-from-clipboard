@@ -13,9 +13,7 @@ const Prefs = Me.imports.prefs;
 
 const ICONS = {
     information: 'dialog-information-symbolic',
-    error: 'dialog-error-symbolic',
-    find: 'edit-find-symbolic',
-    web: 'web-browser-symbolic'
+    error: 'dialog-error-symbolic'
 };
 
 const NotifyPopup = new Lang.Class({
