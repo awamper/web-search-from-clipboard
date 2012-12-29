@@ -118,6 +118,11 @@ const SearchFromClipboard = new Lang.Class({
 
     _search_from_clipboard: function() {
         this._clipboard.get_text(Lang.bind(this, function(clipboard, text) {
+            if(this._settings.get_boolean(Prefs.USE_PRIMARY_SELECTION)) {
+                let primary_text = Utils.get_primary_selection();
+                if(!Utils.is_blank(primary_text)) text = primary_text;
+            }
+
             if(Utils.is_blank(text)) {
                 show_popup(
                     'Clipboard is empty.',
@@ -143,6 +148,11 @@ const SearchFromClipboard = new Lang.Class({
 
     _go_from_clipboard: function() {
         this._clipboard.get_text(Lang.bind(this, function(clipboard, url) {
+            if(this._settings.get_boolean(Prefs.USE_PRIMARY_SELECTION)) {
+                let primary_url = Utils.get_primary_selection();
+                if(!Utils.is_blank(primary_url)) url = primary_url;
+            }
+
             if(Utils.is_blank(url)) {
                 show_popup(
                     'Clipboard is empty.',

@@ -17,5 +17,9 @@
       </default>
       <summary>Search engine.</summary>
     </key>
+
+    <key type="b" name="use-primary-selection">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>

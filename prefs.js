@@ -14,6 +14,7 @@ const Utils = Me.imports.utils;
 const SEARCH_SHORTCUT_KEY = 'search-shortcut';
 const GO_SHORTCUT_KEY = 'go-shortcut';
 const ENGINE_KEY = 'search-engine';
+const USE_PRIMARY_SELECTION = 'use-primary-selection';
 
 const SearchFromClpiboardPrefsWidget = new GObject.Class({
     Name: 'SearchFromClpiboard.Prefs.Widget',
@@ -45,6 +46,13 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
         this.add_shortcut(
             'Open url shortcut:',
             GO_SHORTCUT_KEY
+        );
+
+        // primary selection
+        this.add_boolean(
+            'Use primary selection(requires '+
+            '<a href="http://sourceforge.net/projects/xclip/">xclip</a>):',
+            USE_PRIMARY_SELECTION
         );
     },
 
@@ -135,6 +143,7 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
     add_row: function(text, widget, wrap) {
         let label = new Gtk.Label({
             label: text,
+            use_markup: true,
             hexpand: true,
             halign: Gtk.Align.START
         });

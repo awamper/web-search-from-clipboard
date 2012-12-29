@@ -7,6 +7,7 @@
  */
 
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Params = imports.misc.params;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -122,4 +123,22 @@ function _makeLaunchContext(params) {
         launchContext.set_timestamp(params.timestamp);
 
     return launchContext;
+}
+
+function get_primary_selection() {
+    let result = '';
+
+    try {
+        let r = GLib.spawn_command_line_sync('xclip -o');
+        let selection = r[1].toString().trim();
+
+        if(r[0] == true && !is_blank(selection)) {
+            result = selection;
+        }
+    }
+    catch(e) {
+        result = '';
+    }
+
+    return result;
 }
