@@ -118,11 +118,6 @@ const SearchFromClipboard = new Lang.Class({
 
     _search_from_clipboard: function() {
         this._clipboard.get_text(Lang.bind(this, function(clipboard, text) {
-            if(this._settings.get_boolean(Prefs.USE_PRIMARY_SELECTION)) {
-                let primary_text = Utils.get_primary_selection();
-                if(!Utils.is_blank(primary_text)) text = primary_text;
-            }
-
             if(Utils.is_blank(text)) {
                 show_popup(
                     'Clipboard is empty.',
@@ -146,13 +141,33 @@ const SearchFromClipboard = new Lang.Class({
         }));
     },
 
+    _search_from_primary: function() {
+        let text = Utils.get_primary_selection();
+
+        if(Utils.is_blank(text)) {
+            show_popup(
+                'Primary selection is empty.',
+                ICONS.information,
+                750
+            );
+        }
+        else {
+            text = encodeURIComponent(text);
+            let url = this._settings.get_string(Prefs.ENGINE_KEY).replace(
+                '{term}',
+                text
+            );
+            let popup_params = {
+                text: 'Searching...',
+                icon_name: ICONS.information,
+                timeout: 600
+            };
+            this._open_url(url, popup_params);
+        }
+    },
+
     _go_from_clipboard: function() {
         this._clipboard.get_text(Lang.bind(this, function(clipboard, url) {
-            if(this._settings.get_boolean(Prefs.USE_PRIMARY_SELECTION)) {
-                let primary_url = Utils.get_primary_selection();
-                if(!Utils.is_blank(primary_url)) url = primary_url;
-            }
-
             if(Utils.is_blank(url)) {
                 show_popup(
                     'Clipboard is empty.',
@@ -169,6 +184,26 @@ const SearchFromClipboard = new Lang.Class({
                 this._open_url(url, popup_params);
             }
         }));
+    },
+
+    _go_from_primary: function() {
+        let url = Utils.get_primary_selection();
+
+        if(Utils.is_blank(url)) {
+            show_popup(
+                'Primary selection is empty.',
+                ICONS.information,
+                750
+            );
+        }
+        else {
+            let popup_params = {
+                text: 'Opening...',
+                icon_name: ICONS.information,
+                timeout: 850
+            };
+            this._open_url(url, popup_params);
+        }
     },
 
     _open_url: function(url, popup_params) {
@@ -217,11 +252,29 @@ const SearchFromClipboard = new Lang.Class({
         );
 
         global.display.add_keybinding(
+            Prefs.SEARCH_PRIMARY_SHORTCUT_KEY,
+            this._settings,
+            Meta.KeyBindingFlags.NONE,
+            Lang.bind(this, function() {
+                this._search_from_primary();
+            })
+        );
+
+        global.display.add_keybinding(
             Prefs.GO_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
             Lang.bind(this, function() {
                 this._go_from_clipboard();
+            })
+        );
+
+        global.display.add_keybinding(
+            Prefs.GO_PRIMARY_SHORTCUT_KEY,
+            this._settings,
+            Meta.KeyBindingFlags.NONE,
+            Lang.bind(this, function() {
+                this._go_from_primary();
             })
         );
     },

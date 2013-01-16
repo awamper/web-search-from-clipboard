@@ -12,9 +12,10 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
 const SEARCH_SHORTCUT_KEY = 'search-shortcut';
+const SEARCH_PRIMARY_SHORTCUT_KEY = 'search-primary-selection-shortcut';
 const GO_SHORTCUT_KEY = 'go-shortcut';
+const GO_PRIMARY_SHORTCUT_KEY = 'go-primary-selection-shortcut';
 const ENGINE_KEY = 'search-engine';
-const USE_PRIMARY_SELECTION = 'use-primary-selection';
 
 const SearchFromClpiboardPrefsWidget = new GObject.Class({
     Name: 'SearchFromClpiboard.Prefs.Widget',
@@ -36,10 +37,14 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
             ENGINE_KEY
         );
 
-        // search shortcut
+        // search shortcuts
         this.add_shortcut(
-            'Search shortcut:',
+            'Clipboard search:',
             SEARCH_SHORTCUT_KEY
+        );
+        this.add_shortcut(
+            'Primary selection search<sup>*</sup>:',
+            SEARCH_PRIMARY_SHORTCUT_KEY
         );
 
         // go shortcut
@@ -47,13 +52,18 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
             'Open url shortcut:',
             GO_SHORTCUT_KEY
         );
-
-        // primary selection
-        this.add_boolean(
-            'Use primary selection(requires '+
-            '<a href="http://sourceforge.net/projects/xclip/">xclip</a>):',
-            USE_PRIMARY_SELECTION
+        this.add_shortcut(
+            'Open url from primary selection<sup>*</sup>:',
+            GO_PRIMARY_SHORTCUT_KEY
         );
+
+        let text =
+            '<sup>*</sup>requires <a href="http://sourceforge.net/'+
+            'projects/xclip/">xclip</a>';
+        this.add_item(new Gtk.Label({
+            label: text,
+            use_markup: true
+        }));
     },
 
     add_entry: function(text, key) {
