@@ -1,8 +1,8 @@
 {
-    "description": "<Super>+S - search\n<Super>+G - open url",
+    "description": "<Super>S - search(clipboard)\n<Super><Shift>S - search(primary selection)\n<Super>G - open url(clipboard)\n<Super><Shift>G - open url(primary selection)",
     "name": "Web Search From Clipboard",
     "shell-version": [
-	"3.4",
+        "3.4",
         "3.6"
     ],
     "url": "https://github.com/awamper/web-search-from-clipboard",
