@@ -281,7 +281,9 @@ const SearchFromClipboard = new Lang.Class({
 
     disable: function() {
         global.display.remove_keybinding(Prefs.SEARCH_SHORTCUT_KEY);
+        global.display.remove_keybinding(Prefs.SEARCH_PRIMARY_SHORTCUT_KEY);
         global.display.remove_keybinding(Prefs.GO_SHORTCUT_KEY);
+        global.display.remove_keybinding(Prefs.GO_PRIMARY_SHORTCUT_KEY);
         global.display.disconnect(this._window_handler_id);
     }
 });
