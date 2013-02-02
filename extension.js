@@ -310,16 +310,20 @@ function show_popup(text, icon_name, timeout) {
     }
 }
 
-let search_from_clipboard;
+let search_from_clipboard = null;
 
 function init() {
-    search_from_clipboard = new SearchFromClipboard();
+    // nothing
 }
 
 function enable() {
+    search_from_clipboard = new SearchFromClipboard();
     search_from_clipboard.enable();
 }
 
 function disable() {
-    search_from_clipboard.disable();
+    if(search_from_clipboard != null) {
+        search_from_clipboard.disable();
+        search_from_clipboard = null;
+    }
 }
