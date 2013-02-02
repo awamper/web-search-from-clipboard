@@ -17,9 +17,132 @@ const GO_SHORTCUT_KEY = 'go-shortcut';
 const GO_PRIMARY_SHORTCUT_KEY = 'go-primary-selection-shortcut';
 const ENGINE_KEY = 'search-engine';
 
-const SearchFromClpiboardPrefsWidget = new GObject.Class({
-    Name: 'SearchFromClpiboard.Prefs.Widget',
-    GTypeName: 'SearchFromClpiboardPrefsWidget',
+const SearchFromClipboardKeybindingsWidget = new GObject.Class({
+    Name: 'SearchFromClipboard.Keybindings.Widget',
+    GTypeName: 'SearchFromClipboardKeybindingsWidget',
+    Extends: Gtk.Box,
+
+    _init: function(keybindings) {
+        this.parent();
+        this.set_orientation(Gtk.Orientation.VERTICAL);
+
+        this._keybindings = keybindings;
+        this._settings = Utils.getSettings();
+
+        let scrolled_window = new Gtk.ScrolledWindow();
+        scrolled_window.set_policy(
+            Gtk.PolicyType.AUTOMATIC,
+            Gtk.PolicyType.AUTOMATIC
+        );
+
+        this._columns = {
+            NAME: 0,
+            ACCEL_NAME: 1,
+            MODS: 2,
+            KEY: 3
+        };
+
+        this._store = new Gtk.ListStore();
+        this._store.set_column_types([
+            GObject.TYPE_STRING,
+            GObject.TYPE_STRING,
+            GObject.TYPE_INT,
+            GObject.TYPE_INT
+        ]);
+
+        this._tree_view = new Gtk.TreeView({
+            model: this._store,
+            hexpand: true,
+            vexpand: true
+        });
+        this._tree_view.get_selection().set_mode(Gtk.SelectionMode.SINGLE);
+
+        let action_renderer = new Gtk.CellRendererText();
+        let action_column = new Gtk.TreeViewColumn({
+            'title': 'Action',
+            'expand': true
+        });
+        action_column.pack_start(action_renderer, true);
+        action_column.add_attribute(action_renderer, 'text', 1);
+        this._tree_view.append_column(action_column);
+
+        let keybinding_renderer = new Gtk.CellRendererAccel({
+            'editable': true,
+            'accel-mode': Gtk.CellRendererAccelMode.GTK
+        });
+        keybinding_renderer.connect('accel-edited',
+            Lang.bind(this, function(renderer, iter, key, mods) {
+                let value = Gtk.accelerator_name(key, mods);
+                let [success, iterator ] =
+                    this._store.get_iter_from_string(iter);
+
+                if(!success) {
+                    printerr("Can't change keybinding");
+                }
+
+                let name = this._store.get_value(iterator, 0);
+
+                this._store.set(
+                    iterator,
+                    [this._columns.MODS, this._columns.KEY],
+                    [mods, key]
+                );
+                this._settings.set_strv(name, [value]);
+            })
+        );
+
+        let keybinding_column = new Gtk.TreeViewColumn({
+            'title': 'Modify'
+        });
+        keybinding_column.pack_end(keybinding_renderer, false);
+        keybinding_column.add_attribute(
+            keybinding_renderer,
+            'accel-mods',
+            this._columns.MODS
+        );
+        keybinding_column.add_attribute(
+            keybinding_renderer,
+            'accel-key',
+            this._columns.KEY
+        );
+        this._tree_view.append_column(keybinding_column);
+
+        scrolled_window.add(this._tree_view);
+        this.add(scrolled_window);
+
+        this._refresh();
+    },
+
+    _refresh: function() {
+        this._store.clear();
+
+        for(let settings_key in this._keybindings) {
+            let [key, mods] = Gtk.accelerator_parse(
+                this._settings.get_strv(settings_key)[0]
+            );
+
+            let iter = this._store.append();
+            this._store.set(iter,
+                [
+                    this._columns.NAME,
+                    this._columns.ACCEL_NAME,
+                    this._columns.MODS,
+                    this._columns.KEY
+                ],
+                [
+                    settings_key,
+                    this._keybindings[settings_key],
+                    mods,
+                    key
+                ]
+            );
+        }
+    }
+});
+
+const SearchFromClipboardPrefsGrid = new GObject.Class({
+    Name: 'SearchFromClipboard.Prefs.Grid',
+    GTypeName: 'SearchFromClipboardPrefsGrid',
     Extends: Gtk.Grid,
 
     _init: function(params) {
@@ -30,40 +153,6 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
         Gtk.Settings.get_default().gtk_button_images = true;
 
         this._settings = Utils.getSettings();
-
-        // search engine
-        this.add_entry(
-            'Search engine:',
-            ENGINE_KEY
-        );
-
-        // search shortcuts
-        this.add_shortcut(
-            'Clipboard search:',
-            SEARCH_SHORTCUT_KEY
-        );
-        this.add_shortcut(
-            'Primary selection search<sup>*</sup>:',
-            SEARCH_PRIMARY_SHORTCUT_KEY
-        );
-
-        // go shortcut
-        this.add_shortcut(
-            'Open url shortcut:',
-            GO_SHORTCUT_KEY
-        );
-        this.add_shortcut(
-            'Open url from primary selection<sup>*</sup>:',
-            GO_PRIMARY_SHORTCUT_KEY
-        );
-
-        let text =
-            '<sup>*</sup>requires <a href="http://sourceforge.net/'+
-            'projects/xclip/">xclip</a>';
-        this.add_item(new Gtk.Label({
-            label: text,
-            use_markup: true
-        }));
     },
 
     add_entry: function(text, key) {
@@ -180,12 +269,79 @@ const SearchFromClpiboardPrefsWidget = new GObject.Class({
     }
 });
 
+const SearchFromClipboardPrefsWidget = new GObject.Class({
+    Name: 'SearchFromClipboard.Prefs.Widget',
+    GTypeName: 'SearchFromClipboardPrefsWidget',
+    Extends: Gtk.Box,
+
+    _init: function (params) {
+        this.parent(params);
+        this._settings = Utils.getSettings();
+
+        let main_page = this._get_main_page();
+
+        let notebook = new Gtk.Notebook({
+            margin_left: 5,
+            margin_top: 5,
+            margin_bottom: 5,
+            margin_right: 5,
+            expand: true
+        });
+
+        notebook.append_page(main_page.page, main_page.label);
+
+        this.add(notebook);
+    },
+
+    _get_main_page: function() {
+        let page_label = new Gtk.Label({
+            label: 'Settings'
+        });
+        let page = new SearchFromClipboardPrefsGrid();
+
+        // search engine
+        page.add_entry(
+            'Search engine:',
+            ENGINE_KEY
+        );
+
+        let keybindings = {};
+        keybindings[SEARCH_SHORTCUT_KEY] =
+            'Search from clipboard';
+        keybindings[SEARCH_PRIMARY_SHORTCUT_KEY] =
+            'Search from primary selection';
+        keybindings[GO_SHORTCUT_KEY] =
+            'Open url from clipboard';
+        keybindings[GO_PRIMARY_SHORTCUT_KEY] =
+            'Open url from primary selection';
+
+        let keybindings_widget = new SearchFromClipboardKeybindingsWidget(
+            keybindings
+        );
+        page.add_item(keybindings_widget)
+
+        let text =
+            '<sup>*</sup>Search from primary selection requires ' +
+            '<a href="http://sourceforge.net/projects/xclip/">xclip</a>';
+        page.add_item(new Gtk.Label({
+            label: text,
+            use_markup: true
+        }));
+
+        let result = {
+            label: page_label,
+            page: page
+        };
+        return result;
+    },
+});
+
 function init(){
     // nothing
 }
 
 function buildPrefsWidget() {
-    let widget = new SearchFromClpiboardPrefsWidget();
+    let widget = new SearchFromClipboardPrefsWidget();
     widget.show_all();
 
     return widget;
