@@ -320,14 +320,6 @@ const SearchFromClipboardPrefsWidget = new GObject.Class({
         );
         page.add_item(keybindings_widget)
 
-        let text =
-            '<sup>*</sup>Search from primary selection requires ' +
-            '<a href="http://sourceforge.net/projects/xclip/">xclip</a>';
-        page.add_item(new Gtk.Label({
-            label: text,
-            use_markup: true
-        }));
-
         let result = {
             label: page_label,
             page: page

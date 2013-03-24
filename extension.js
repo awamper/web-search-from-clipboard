@@ -2,6 +2,7 @@ const Lang = imports.lang;
 const St = imports.gi.St;
 const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
+const Shell = imports.gi.Shell;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
 const Params = imports.misc.params;
@@ -15,85 +16,6 @@ const ICONS = {
     information: 'dialog-information-symbolic',
     error: 'dialog-error-symbolic'
 };
-
-const NotifyPopup = new Lang.Class({
-    Name: 'NotifyPopup',
-    Extends: ModalDialog.ModalDialog,
-
-    _init: function(params) {
-        this.parent({
-            shellReactive: true
-        });
-        this._dialogLayout = 
-            typeof this.dialogLayout === "undefined"
-            ? this._dialogLayout
-            : this.dialogLayout
-
-        this._dialogLayout.set_style_class_name('notify-popup-modal');
-
-        this.params = Params.parse(params, {
-            text: 'Nothing',
-            icon_name: ICONS.information,
-            timeout: 600 // ms
-        });
-
-        let label = new St.Label({
-            text: this.params.text,
-            style_class: 'notify-popup-label'
-        });
-        let icon = new St.Icon({
-            icon_name: this.params.icon_name,
-            style_class: 'notify-popup-icon'
-        });
-
-        let notify_table = new St.Table({
-            name: 'notify_popup_table',
-            style_class: 'notify-popup-box'
-        })
-        notify_table.add(icon, {
-            row: 0,
-            col: 0
-        });
-        notify_table.add(label, {
-            row: 0,
-            col: 1
-        });
-
-        this._dialogLayout.add(notify_table);
-    },
-
-    display: function() {
-        if(this._timeout_id != 0) {
-            Mainloop.source_remove(this._timeout_id);
-            this._timeout_id = 0;
-        }
-
-        this._timeout_id = Mainloop.timeout_add(
-            this.params.timeout,
-            Lang.bind(this, this._on_timeout)
-        );
-        this.open();
-    },
-
-    _on_timeout : function() {
-        if(this._timeout_id != 0) {
-            Mainloop.source_remove(this._timeout_id);
-            this._timeout_id = 0;
-        }
-
-        this.close();
-        this.destroy();
-    },
-
-    destroy: function() {
-        if(this._timeout_id != 0) {
-            Mainloop.source_remove(this._timeout_id);
-            this._timeout_id = 0;
-        }
-
-        this.parent();
-    }
-});
 
 const SearchFromClipboard = new Lang.Class({
     Name: 'SearchFromClipboard',
@@ -116,14 +38,10 @@ const SearchFromClipboard = new Lang.Class({
         }
     },
 
-    _search_from_clipboard: function() {
-        this._clipboard.get_text(Lang.bind(this, function(clipboard, text) {
+    _search_from_clipboard: function(clipboard_type) {
+        this._clipboard.get_text(clipboard_type, Lang.bind(this, function(clipboard, text) {
             if(Utils.is_blank(text)) {
-                show_popup(
-                    'Clipboard is empty.',
-                    ICONS.information,
-                    750
-                );
+                Main.notify('Clipboard is empty.')
             }
             else {
                 text = encodeURIComponent(text);
@@ -131,105 +49,30 @@ const SearchFromClipboard = new Lang.Class({
                     '{term}',
                     text
                 );
-                let popup_params = {
-                    text: 'Searching...',
-                    icon_name: ICONS.information,
-                    timeout: 600
-                };
-                this._open_url(url, popup_params);
+                this._open_url(url, "Searching...");
             }
         }));
     },
 
-    _search_from_primary: function() {
-        let text = Utils.get_primary_selection();
-
-        if(Utils.is_blank(text)) {
-            show_popup(
-                'Primary selection is empty.',
-                ICONS.information,
-                750
-            );
-        }
-        else {
-            text = encodeURIComponent(text);
-            let url = this._settings.get_string(Prefs.ENGINE_KEY).replace(
-                '{term}',
-                text
-            );
-            let popup_params = {
-                text: 'Searching...',
-                icon_name: ICONS.information,
-                timeout: 600
-            };
-            this._open_url(url, popup_params);
-        }
-    },
-
-    _go_from_clipboard: function() {
-        this._clipboard.get_text(Lang.bind(this, function(clipboard, url) {
+    _go_from_clipboard: function(clipboard_type) {
+        this._clipboard.get_text(clipboard_type, Lang.bind(this, function(clipboard, url) {
             if(Utils.is_blank(url)) {
-                show_popup(
-                    'Clipboard is empty.',
-                    ICONS.information,
-                    750
-                );
+                Main.notify('Clipboard is empty.')
             }
             else {
-                let popup_params = {
-                    text: 'Opening...',
-                    icon_name: ICONS.information,
-                    timeout: 850
-                };
-                this._open_url(url, popup_params);
+                this._open_url(url, "Opening...");
             }
         }));
     },
 
-    _go_from_primary: function() {
-        let url = Utils.get_primary_selection();
-
-        if(Utils.is_blank(url)) {
-            show_popup(
-                'Primary selection is empty.',
-                ICONS.information,
-                750
-            );
-        }
-        else {
-            let popup_params = {
-                text: 'Opening...',
-                icon_name: ICONS.information,
-                timeout: 850
-            };
-            this._open_url(url, popup_params);
-        }
-    },
-
-    _open_url: function(url, popup_params) {
+    _open_url: function(url, message) {
         url = Utils.get_url(url);
 
         if(!url) {
-            show_popup(
-                'Invalid url.',
-                ICONS.error,
-                750
-            );
+            Main.notify('Invalid url.')
         }
         else {
-            popup_params = Params.parse(popup_params, {
-                text: false,
-                icon_name: ICONS.information,
-                timeout: 650
-            });
-
-            if(popup_params.text) {
-                show_popup(
-                    popup_params.text,
-                    popup_params.icon_name,
-                    popup_params.timeout
-                );
-            }
+            if(!Utils.is_blank(message)) Main.notify(message);
         }
 
         this.activate_window = true;
@@ -242,48 +85,60 @@ const SearchFromClipboard = new Lang.Class({
     },
 
     enable: function() {
-        global.display.add_keybinding(
+        Main.wm.addKeybinding(
             Prefs.SEARCH_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
+            Shell.KeyBindingMode.NORMAL |
+            Shell.KeyBindingMode.MESSAGE_TRAY |
+            Shell.KeyBindingMode.OVERVIEW,
             Lang.bind(this, function() {
-                this._search_from_clipboard();
+                this._search_from_clipboard(St.ClipboardType.CLIPBOARD);
             })
         );
 
-        global.display.add_keybinding(
+        Main.wm.addKeybinding(
             Prefs.SEARCH_PRIMARY_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
+            Shell.KeyBindingMode.NORMAL |
+            Shell.KeyBindingMode.MESSAGE_TRAY |
+            Shell.KeyBindingMode.OVERVIEW,
             Lang.bind(this, function() {
-                this._search_from_primary();
+                this._search_from_clipboard(St.ClipboardType.PRIMARY);
             })
         );
 
-        global.display.add_keybinding(
+        Main.wm.addKeybinding(
             Prefs.GO_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
+            Shell.KeyBindingMode.NORMAL |
+            Shell.KeyBindingMode.MESSAGE_TRAY |
+            Shell.KeyBindingMode.OVERVIEW,
             Lang.bind(this, function() {
-                this._go_from_clipboard();
+                this._go_from_clipboard(St.ClipboardType.CLIPBOARD);
             })
         );
 
-        global.display.add_keybinding(
+        Main.wm.addKeybinding(
             Prefs.GO_PRIMARY_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
+            Shell.KeyBindingMode.NORMAL |
+            Shell.KeyBindingMode.MESSAGE_TRAY |
+            Shell.KeyBindingMode.OVERVIEW,
             Lang.bind(this, function() {
-                this._go_from_primary();
+                this._go_from_clipboard(St.ClipboardType.PRIMARY);
             })
         );
     },
 
     disable: function() {
-        global.display.remove_keybinding(Prefs.SEARCH_SHORTCUT_KEY);
-        global.display.remove_keybinding(Prefs.SEARCH_PRIMARY_SHORTCUT_KEY);
-        global.display.remove_keybinding(Prefs.GO_SHORTCUT_KEY);
-        global.display.remove_keybinding(Prefs.GO_PRIMARY_SHORTCUT_KEY);
+        Main.wm.removeKeybinding(Prefs.SEARCH_SHORTCUT_KEY);
+        Main.wm.removeKeybinding(Prefs.SEARCH_PRIMARY_SHORTCUT_KEY);
+        Main.wm.removeKeybinding(Prefs.GO_SHORTCUT_KEY);
+        Main.wm.removeKeybinding(Prefs.GO_PRIMARY_SHORTCUT_KEY);
         global.display.disconnect(this._window_handler_id);
     }
 });
