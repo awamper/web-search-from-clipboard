@@ -4,9 +4,7 @@ const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Main = imports.ui.main;
-const Mainloop = imports.mainloop;
 const Params = imports.misc.params;
-const ModalDialog = imports.ui.modalDialog;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
