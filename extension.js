@@ -141,28 +141,6 @@ const SearchFromClipboard = new Lang.Class({
     }
 });
 
-function show_popup(text, icon_name, timeout) {
-    if(Utils.is_blank(text)) {
-        return false;
-    }
-    else {
-        let params = {};
-        params.text = text;
-
-        if(!Utils.is_blank(icon_name)) {
-            params.icon_name = icon_name;
-        }
-        if((timeout | 0) > 0 && timeout % 1 == 0) {
-            params.timeout = timeout;
-        }
-
-        let popup = new NotifyPopup(params);
-        popup.display();
-
-        return true;
-    }
-}
-
 let search_from_clipboard = null;
 
 function init() {
