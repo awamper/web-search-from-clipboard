@@ -37,30 +37,38 @@ const SearchFromClipboard = new Lang.Class({
     },
 
     _search_from_clipboard: function(clipboard_type) {
-        this._clipboard.get_text(clipboard_type, Lang.bind(this, function(clipboard, text) {
-            if(Utils.is_blank(text)) {
-                Main.notify('Clipboard is empty.')
-            }
-            else {
-                text = encodeURIComponent(text);
-                let url = this._settings.get_string(Prefs.ENGINE_KEY).replace(
-                    '{term}',
-                    text
-                );
-                this._open_url(url, "Searching...");
-            }
-        }));
+        this._clipboard.get_text(clipboard_type,
+            Lang.bind(this, function(clipboard, text) {
+                if(Utils.is_blank(text)) {
+                    Main.notify('Clipboard is empty.')
+                }
+                else {
+                    let url = this._settings.get_string(Prefs.ENGINE_KEY).replace(
+                        '{term}',
+                        encodeURIComponent(text).trim()
+                    );
+                    this._open_url(url, 'Searching "%s"...'.format(
+                        text.substr(0, 400)
+                    ));
+                }
+            })
+        );
     },
 
     _go_from_clipboard: function(clipboard_type) {
-        this._clipboard.get_text(clipboard_type, Lang.bind(this, function(clipboard, url) {
-            if(Utils.is_blank(url)) {
-                Main.notify('Clipboard is empty.')
-            }
-            else {
-                this._open_url(url, "Opening...");
-            }
-        }));
+        this._clipboard.get_text(clipboard_type,
+            Lang.bind(this, function(clipboard, url) {
+                if(Utils.is_blank(url)) {
+                    Main.notify('Clipboard is empty.')
+                }
+                else {
+                    url = url.trim()
+                    this._open_url(url, 'Opening "%s"...'.format(
+                        url.substr(0, 400)
+                    ));
+                }
+            })
+        );
     },
 
     _open_url: function(url, message) {
