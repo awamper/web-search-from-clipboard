@@ -4,7 +4,7 @@
   <schema path="/org/gnome/shell/extensions/web-search-from-clipboard/" id="org.gnome.shell.extensions.web-search-from-clipboard">
 
     <key type="as" name="search-shortcut">
-      <default><![CDATA[['<Super>S']]]></default>
+      <default><![CDATA[['<Super><Control>S']]]></default>
     </key>
 
     <key type="as" name="search-primary-selection-shortcut">
