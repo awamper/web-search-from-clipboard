@@ -47,7 +47,7 @@ const SearchFromClipboard = new Lang.Class({
                         '{term}',
                         encodeURIComponent(text).trim()
                     );
-                    this._open_url(url, 'Searching "%s"...'.format(
+                    this._open_url(url, 'Searching %s'.format(
                         text.substr(0, 400)
                     ));
                 }
@@ -63,7 +63,7 @@ const SearchFromClipboard = new Lang.Class({
                 }
                 else {
                     url = url.trim()
-                    this._open_url(url, 'Opening "%s"...'.format(
+                    this._open_url(url, 'Opening %s'.format(
                         url.substr(0, 400)
                     ));
                 }
@@ -95,9 +95,9 @@ const SearchFromClipboard = new Lang.Class({
             Prefs.SEARCH_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
-            Shell.KeyBindingMode.NORMAL |
-            Shell.KeyBindingMode.MESSAGE_TRAY |
-            Shell.KeyBindingMode.OVERVIEW,
+            Shell.ActionMode.NORMAL |
+            Shell.ActionMode.MESSAGE_TRAY |
+            Shell.ActionMode.OVERVIEW,
             Lang.bind(this, function() {
                 this._search_from_clipboard(St.ClipboardType.CLIPBOARD);
             })
@@ -107,9 +107,9 @@ const SearchFromClipboard = new Lang.Class({
             Prefs.SEARCH_PRIMARY_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
-            Shell.KeyBindingMode.NORMAL |
-            Shell.KeyBindingMode.MESSAGE_TRAY |
-            Shell.KeyBindingMode.OVERVIEW,
+            Shell.ActionMode.NORMAL |
+            Shell.ActionMode.MESSAGE_TRAY |
+            Shell.ActionMode.OVERVIEW,
             Lang.bind(this, function() {
                 this._search_from_clipboard(St.ClipboardType.PRIMARY);
             })
@@ -119,9 +119,9 @@ const SearchFromClipboard = new Lang.Class({
             Prefs.GO_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
-            Shell.KeyBindingMode.NORMAL |
-            Shell.KeyBindingMode.MESSAGE_TRAY |
-            Shell.KeyBindingMode.OVERVIEW,
+            Shell.ActionMode.NORMAL |
+            Shell.ActionMode.MESSAGE_TRAY |
+            Shell.ActionMode.OVERVIEW,
             Lang.bind(this, function() {
                 this._go_from_clipboard(St.ClipboardType.CLIPBOARD);
             })
@@ -131,9 +131,9 @@ const SearchFromClipboard = new Lang.Class({
             Prefs.GO_PRIMARY_SHORTCUT_KEY,
             this._settings,
             Meta.KeyBindingFlags.NONE,
-            Shell.KeyBindingMode.NORMAL |
-            Shell.KeyBindingMode.MESSAGE_TRAY |
-            Shell.KeyBindingMode.OVERVIEW,
+            Shell.ActionMode.NORMAL |
+            Shell.ActionMode.MESSAGE_TRAY |
+            Shell.ActionMode.OVERVIEW,
             Lang.bind(this, function() {
                 this._go_from_clipboard(St.ClipboardType.PRIMARY);
             })
