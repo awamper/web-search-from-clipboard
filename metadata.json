@@ -2,8 +2,7 @@
     "description": "<Super><Control>S - search(clipboard)\n<Super><Shift>S - search(primary selection)\n<Super>G - open url(clipboard)\n<Super><Shift>G - open url(primary selection)",
     "name": "Web Search From Clipboard",
     "shell-version": [
-        "3.15.90",
-        "3.16"
+	"3.20"
     ],
     "url": "https://github.com/awamper/web-search-from-clipboard",
     "uuid": "web_search_from_clipboard@awamper.gmail.com",
